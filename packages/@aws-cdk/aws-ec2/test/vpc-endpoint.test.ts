@@ -326,6 +326,24 @@ nodeunitShim({
 
       test.done();
     },
+    'with existing security groups for s3'(test: Test) {
+      // GIVEN
+      const stack = new Stack();
+      const vpc = new Vpc(stack, 'VpcNetwork');
+
+      // WHEN
+      vpc.addInterfaceEndpoint('S3', {
+        service: InterfaceVpcEndpointAwsService.S3,
+        securityGroups: [SecurityGroup.fromSecurityGroupId(stack, 'SG', 'existing-id')],
+      });
+
+      // THEN
+      expect(stack).to(haveResource('AWS::EC2::VPCEndpoint', {
+        SecurityGroupIds: ['existing-id'],
+      }));
+
+      test.done();
+    },
     'with existing security groups for efs'(test: Test) {
       // GIVEN
       const stack = new Stack();
